@@ -12,17 +12,14 @@ $ cd coreos-live-iso
 # if you need to edit configuration parameter
 $ vim makeiso.sh
 
-# iso file is outputs at the same directory as makeiso.sh
-$ ./makeiso.sh
+# build iso file.
+$ cp ~/.ssh/id_rsa.pub .
+$ ./docker-build
 ```
 
 Requirements
 ------------
-
-* `bash`
-* `curl`
-* `tar`
-* `mkisofs` (includes `cdrtools` in major distributions)
+* `docker`
 
 Author
 ------

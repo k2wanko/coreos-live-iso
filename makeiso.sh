@@ -10,7 +10,7 @@ set -e
 SYSLINUX_VERSION=${SYSLINUX_VERSION:="6.02"}
 COREOS_VERSION=${COREOS_VERSION:="dev-channel"}
 BOOT_ENV=${BOOT_ENV:="bios"}
-SSH_PUBKEY_PATH=${SSH_PUBKEY_PATH:=~/.ssh/id_rsa.pub}
+SSH_PUBKEY_PATH=${SSH_PUBKEY_PATH:=./id_rsa.pub}
 CURL=${CURL:="curl"} 
  
 # Initialze variables
@@ -107,9 +107,9 @@ echo "-----> Make ISO file"
 cd iso
 mkisofs -v -l -r -J -o ${bindir}/CoreOS.${COREOS_VERSION}.iso -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table .
 isohybrid ${bindir}/CoreOS.${COREOS_VERSION}.iso
+mv ${bindir}/CoreOS.${COREOS_VERSION}.iso /CoreOS.iso
 echo "-----> Cleanup"
 cd $bindir
 rm -rf $workdir
  
 echo "-----> Finished"
-echo "-----> Install ${bindir}/CoreOS.${COREOS_VERSION}.iso and ssh core@<ip>"
