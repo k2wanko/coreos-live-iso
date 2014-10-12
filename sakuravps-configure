@@ -92,20 +92,7 @@ cat <<EOF > ./cloud-config
 #cloud-config
 
 coreos:
-  etcd:
-    name: sakuraVPS0
-    discovery: $(curl -L https://discovery.etcd.io/new)
-    addr: $VPS_IP:4001
-    peer-addr: $VPS_IP:7001
-
-  fleet:
-    public-ip: \$public_ipv4
-
   units:
-    - name: etcd.service
-      command: start
-    - name: fleet.service
-      command: start
     - name: static.network
       content: |
       [Match]
