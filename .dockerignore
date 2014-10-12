@@ -1,3 +1,5 @@
 work/
 *.iso
 .git
+cloud-config
+sakuravps-configure

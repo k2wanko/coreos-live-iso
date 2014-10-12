@@ -1,0 +1,140 @@
+#!/bin/bash
+# Author: Kazuhrio Kubota (k2wanko) <k2.wanko[ at ]gmail.com>
+#
+# Usage: ./generate-config
+# 
+# Unlicense: This script is under the public domain.
+#
+
+
+ip_addr=""
+passwd=""
+
+curl=$(which curl)
+lcurl=""
+
+cookie_file="cookie"
+
+vps_init() {
+
+  if [ -z $ip_addr ]; then
+    echo -n "IP Addr: "
+    read ip_addr
+  fi
+
+  if [ -z $passwd ]; then
+    echo -n "Password "
+    stty -echo
+    read passwd
+    stty echo
+  fi
+
+  echo -e "\n"
+}
+
+login() {
+  vps_init
+  url="https://secure.sakura.ad.jp/vpscontrol/"
+  token=$($curl -L $url | grep Token | sed -e 's/.* value="\(.*\)".*/\1/g')
+  
+  $curl -L -c $cookie_file \
+      -F "Submit=index" \
+      -F "Token=$token" \
+      -F "ipaddress=$ip_addr" \
+      -F "password=$passwd" \
+      $url > /dev/null
+
+  if [ ! -e $cookie_file ]; then
+    echo "Login failure."
+    finish -1
+  fi
+
+  name=$(cat $cookie_file | grep secure.sakura.ad.jp  |awk '{print $6}')
+  val=$(cat $cookie_file | grep secure.sakura.ad.jp  |awk '{print $7}')
+
+  
+
+  lcurl="eval $curl -L -b \"$name=$val\""
+
+}
+
+generate_config() {
+  url="https://secure.sakura.ad.jp/vpscontrol/main/"
+
+  tmp=$($lcurl \
+      -F "Token=$token" \
+      $url | egrep "[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+" | sed -e "s/[^0-9\.,]//g" | tr ',' ' ')
+
+  ip=$(echo $tmp | awk '{print $1}')
+  gateway=$(echo $tmp | awk '{print $3}')
+  dns1=$(echo $tmp | awk '{print $4}')
+  dns2=$(echo $tmp | awk '{print $5}')
+  cat <<EOF > ./vps-config
+#VPS Config
+VPS_IP="$ip"
+VPS_GATEWAY="$gateway"
+VPS_DNS1="$dns1"
+VPS_DNS2="$dns2"
+EOF
+}
+
+generate_cloud_config() {
+  #init
+
+  if [ ! -e ./vps-config ]; then
+    echo "Not Found vps-config."
+    finish -1
+  fi
+
+  . ./vps-config
+
+cat <<EOF > ./cloud-config
+#cloud-config
+
+coreos:
+  etcd:
+    name: sakuraVPS0
+    discovery: $(curl -L https://discovery.etcd.io/new)
+    addr: $VPS_IP:4001
+    peer-addr: $VPS_IP:7001
+
+  fleet:
+    public-ip: \$public_ipv4
+
+  units:
+    - name: etcd.service
+      command: start
+    - name: fleet.service
+      command: start
+    - name: static.network
+      content: |
+      [Match]
+      Name=eth0
+      
+      [Network]
+      Address=$VPS_IP/23
+      Gateway=$VPS_GATEWAY
+      DNS=$VPS_DNS1
+      DNS=$VPS_DNS2
+
+ssh_authorized_keys:
+  - $(cat $HOME/.ssh/id_rsa.pub)
+EOF
+
+}
+
+finish() {
+
+  rm -f $cookie_file
+
+  exit $1
+}
+
+main() {
+  login
+  generate_config
+  generate_cloud_config
+  finish 0
+}
+
+main

@@ -1,4 +1,5 @@
 work/
 *.iso
 *.pub
-
+vps-config
+cloud-config

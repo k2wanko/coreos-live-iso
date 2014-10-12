@@ -25,12 +25,20 @@ COREOS_VER_URL="${COREOS_BASE_URL}/${COREOS_VERSION}/version.txt"
 COREOS_KERN_URL="${COREOS_BASE_URL}/${COREOS_VERSION}/${COREOS_KERN_BASENAME}"
 COREOS_INITRD_URL="${COREOS_BASE_URL}/${COREOS_VERSION}/${COREOS_INITRD_BASENAME}"
 
+VPS_CONFIG_PATH="vps-config"
+
 if [ ! -f "${SSH_PUBKEY_PATH}" ]; then
     echo "Missing ${SSH_PUBKEY_PATH}. Please run ssh-keygen to generate keys."
     exit
 fi
 SSH_PUBKEY=`cat ${SSH_PUBKEY_PATH}`
- 
+
+if [ ! -f "${VPS_CONFIG_PATH}" ]; then
+    echo "Missing ${VPS_CONFIG_PATH}. Please run sakuravps-configure"
+    exit
+fi
+. $(pwd)/$VPS_CONFIG_PATH
+
 bindir=`cd $(dirname $0) && pwd`
 workdir=$bindir/${COREOS_VERSION}
  
@@ -66,6 +74,19 @@ cat<<EOF > usr/share/oem/run
 # Place your OEM run commands here...
  
 EOF
+
+mkdir -p etc/systemd/network/
+cat<<EOF > etc/systemd/network/static.network
+[Match]
+Name=eth0
+
+[Network]
+Address=$VPS_IP/23
+Gateway=$VPS_GATEWAY
+DNS=$VPS_DNS1
+DNS=$VPS_DNS2
+EOF
+
 chmod +x usr/share/oem/run
 gzip -d cpio.gz
 find usr | cpio -o -A -H newc -O cpio
