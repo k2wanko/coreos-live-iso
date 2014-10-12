@@ -9,7 +9,9 @@ RUN apt-get install -y syslinux
 RUN mkdir /work
 WORKDIR /work
 
-COPY ./id_rsa.pub /work/id_rsa.pub
-
 COPY . /work
-CMD ["./makeiso.sh"]
+
+ENV SSH_PUBKEY_PATH ./id_rsa.pub
+ENV COREOS_VERSION master
+
+RUN ./makeiso.sh && mv CoreOS.${COREOS_VERSION}.iso /CoreOS.iso

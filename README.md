@@ -14,7 +14,9 @@ $ vim makeiso.sh
 
 # build iso file.
 $ cp ~/.ssh/id_rsa.pub .
-$ ./docker-build
+$ docker build user/coreos-live-iso .
+$ docker run --name coreos-iso user/coreos-live-iso
+$ docker cp coreos-iso:CoreOS.iso .
 ```
 
 Requirements
