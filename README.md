@@ -8,15 +8,17 @@ Usage
 # clone my repository
 $ git clone https://github.com/nyarla/coreos-live-iso
 $ cd coreos-live-iso
+$ git checkout sakura-vps
 
-# if you need to edit configuration parameter
-$ vim makeiso.sh
-
-# build iso file.
+# Create config files
 $ cp ~/.ssh/id_rsa.pub .
-$ docker build user/coreos-live-iso .
-$ docker run --name coreos-iso user/coreos-live-iso
-$ docker cp coreos-iso:CoreOS.iso .
+$ ./sakuravps-configure
+
+# if you need to edit configuration parameter on Dockerfile
+$ ./build
+
+# Upload ISO
+$ sftp vps0000@example.com 0< sftp-cmd
 ```
 
 Requirements
