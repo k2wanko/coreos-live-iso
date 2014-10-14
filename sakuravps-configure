@@ -93,19 +93,20 @@ cat <<EOF > ./cloud-config
 
 coreos:
   units:
-    - name: static.network
+    - name: 00-eth0.network
+      runtime: true
       content: |
-      [Match]
-      Name=eth0
-      
-      [Network]
-      Address=$VPS_IP/23
-      Gateway=$VPS_GATEWAY
-      DNS=$VPS_DNS1
-      DNS=$VPS_DNS2
+        [Match]
+        Name=eth0
+        
+        [Network]
+        Address=$VPS_IP/23
+        Gateway=$VPS_GATEWAY
+        DNS=$VPS_DNS1
+        DNS=$VPS_DNS2
 
 ssh_authorized_keys:
-  - $(cat $HOME/.ssh/id_rsa.pub)
+  - $(cat ./id_rsa.pub)
 EOF
 
 }
