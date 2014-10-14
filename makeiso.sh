@@ -70,24 +70,39 @@ cd iso/coreos
 mkdir -p usr/share/oem
 cat<<EOF > usr/share/oem/run
 #!/bin/sh
- 
+
+ifconfig ens3 $VPS_IP netmask 255.255.254.0
+route add default gw $VPS_GATEWAY
+wget --no-check-certificate -O /home/core/coreos-install https://raw.githubusercontent.com/coreos/init/2294c2a4c09f905df162b2a6537deef66e2c8c0c/bin/coreos-install
+chmod +x /home/core/coreos-install
+#./coreos-install -d /dev/vda -V current -C alpha
 # Place your OEM run commands here...
  
 EOF
+chmod +x usr/share/oem/run
 
-mkdir -p etc/systemd/network/
-cat<<EOF > etc/systemd/network/static.network
-[Match]
-Name=eth0
-
-[Network]
-Address=$VPS_IP/23
-Gateway=$VPS_GATEWAY
-DNS=$VPS_DNS1
-DNS=$VPS_DNS2
+cat<<EOF > usr/share/oem/cloud-config.yml
+#cloud-config
+write_files:
+  - path: /etc/resolv.conf
+    content: |
+        # cloud-config/write_files
+        nameserver $VPS_DNS1
+        nameserver $VPS_DNS2
 EOF
 
-chmod +x usr/share/oem/run
+# mkdir -p etc/systemd/network/
+# cat<<EOF > etc/systemd/network/static.network
+# [Match]
+# Name=eth0
+
+# [Network]
+# Address=$VPS_IP/23
+# Gateway=$VPS_GATEWAY
+# DNS=$VPS_DNS1
+# DNS=$VPS_DNS2
+# EOF
+
 gzip -d cpio.gz
 find usr | cpio -o -A -H newc -O cpio
 gzip cpio
