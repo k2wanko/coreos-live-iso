@@ -8,3 +8,6 @@ route add default gw $VPS_GATEWAY
 
 echo "nameserver $VPS_DNS1" > /home/core/resolv.conf
 ln -fs /home/core/resolv.conf /etc/resolv.conf
+
+mv /usr/share/oem/cloud-config /home/core/cloud-config
+chown core:core /home/core/cloud-config

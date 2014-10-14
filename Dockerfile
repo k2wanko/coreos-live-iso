@@ -36,8 +36,9 @@ RUN download-coreos
 WORKDIR iso/coreos
 RUN mkdir -p usr/share/oem
 
-COPY vps-config /work/iso/coreos/usr/share/oem/vps-config
-COPY oem-run /work/iso/coreos/usr/share/oem/run
+COPY cloud-config /work/iso/coreos/usr/share/oem/cloud-config
+COPY vps-config   /work/iso/coreos/usr/share/oem/vps-config
+COPY oem-run      /work/iso/coreos/usr/share/oem/run
 #COPY cloud-config.yml /work/iso/coreos/usr/share/oem/cloud-config.yml
 
 RUN gzip -d cpio.gz
