@@ -1,1 +1,10 @@
 #!/bin/sh
+
+. /usr/share/oem/vps-config
+
+# Network Setting
+ifconfig eth0 $VPS_IP netmask 255.255.254.0
+route add default gw $VPS_GATEWAY
+
+echo "nameserver $VPS_DNS1" > /home/core/resolv.conf
+ln -fs /home/core/resolv.conf /etc/resolv.conf

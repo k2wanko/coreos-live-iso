@@ -7,5 +7,5 @@ timeout 15
  
 label coreos
   kernel /coreos/vmlinuz
-  append initrd=/coreos/cpio.gz root=squashfs: state=tmpfs: sshkey="$(cat /id_rsa.pub)"
+  append initrd=/coreos/cpio.gz state=tmpfs: sshkey="$(cat /id_rsa.pub)"
 EOF

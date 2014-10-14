@@ -9,7 +9,6 @@ RUN apt-get install -y syslinux
 
 WORKDIR /work
 RUN mkdir -p iso/coreos iso/syslinux iso/isolinux 
-COPY scripts /scripts
 ENV PATH /scripts:$PATH
 
 # Set public key
@@ -20,8 +19,9 @@ ENV SYSLINUX_VERSION 6.03
 ENV SYSLINUX_BASENAME syslinux-${SYSLINUX_VERSION}
 ENV SYSLINUX_URL ftp://www.kernel.org/pub/linux/utils/boot/syslinux/${SYSLINUX_BASENAME}.tar.gz
 ENV BOOT_ENV bios
+COPY scripts/download-syslinux /scripts/download-syslinux
 RUN download-syslinux
-RUN set-syslinux
+COPY scripts/set-syslinux /scripts/set-syslinux
 
 # Download CoreOS
 ENV CHANNEL stable
@@ -30,17 +30,23 @@ ENV COREOS_BASE_URL   http://${CHANNEL}.release.core-os.net/amd64-usr/${VERSION}
 ENV COREOS_VER_URL    ${COREOS_BASE_URL}/version.txt
 ENV COREOS_KERN_URL   ${COREOS_BASE_URL}/coreos_production_pxe.vmlinuz
 ENV COREOS_INITRD_URL ${COREOS_BASE_URL}/coreos_production_pxe_image.cpio.gz
+COPY scripts/download-coreos /scripts/download-coreos
 RUN download-coreos
 
 WORKDIR iso/coreos
 RUN mkdir -p usr/share/oem
 
-COPY oem-run usr/share/oem/run
-COPY oem-cloud-config.yml usr/share/oem/cloud-config.yml
+COPY vps-config /work/iso/coreos/usr/share/oem/vps-config
+COPY oem-run /work/iso/coreos/usr/share/oem/run
+#COPY cloud-config.yml /work/iso/coreos/usr/share/oem/cloud-config.yml
 
 RUN gzip -d cpio.gz
 RUN find usr | cpio -o -A -H newc -O cpio
 RUN gzip cpio
+
+# Set syslinux
+WORKDIR /work
+RUN set-syslinux
 
 # Make ISO
 WORKDIR /work/iso
