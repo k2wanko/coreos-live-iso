@@ -1,0 +1,11 @@
+#!/bin/sh
+
+name="coreos-iso"
+image="k2wanko/coreos-live-iso"
+
+./sakuravps-configure
+
+docker build -t $image .
+docker run --name $name $image
+docker cp $name:CoreOS.iso .
+docker rm $name
