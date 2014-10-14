@@ -1,0 +1,15 @@
+#!/bin/sh
+
+curl -o version.txt ${COREOS_VER_URL} > /dev/null && cat version.txt
+curl -o iso/coreos/vmlinuz ${COREOS_KERN_URL} > /dev/null
+curl -o iso/coreos/cpio.gz ${COREOS_INITRD_URL} > /dev/null
+
+
+
+
+
+
+
+
+
+

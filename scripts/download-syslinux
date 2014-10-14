@@ -1,0 +1,13 @@
+#!/bin/sh
+
+curl -o ${SYSLINUX_BASENAME}.tar.gz ${SYSLINUX_URL} > /dev/null
+tar zxf ${SYSLINUX_BASENAME}.tar.gz
+cp ${SYSLINUX_BASENAME}/${BOOT_ENV}/com32/chain/chain.c32 iso/syslinux/
+cp ${SYSLINUX_BASENAME}/${BOOT_ENV}/com32/lib/libcom32.c32 iso/syslinux/
+cp ${SYSLINUX_BASENAME}/${BOOT_ENV}/com32/libutil/libutil.c32 iso/syslinux/
+cp ${SYSLINUX_BASENAME}/${BOOT_ENV}/memdisk/memdisk iso/syslinux/
+cp ${SYSLINUX_BASENAME}/${BOOT_ENV}/core/isolinux.bin iso/isolinux/
+cp ${SYSLINUX_BASENAME}/${BOOT_ENV}/com32/elflink/ldlinux/ldlinux.c32 iso/isolinux/
+echo "INCLUDE /syslinux/syslinux.cfg" > iso/isolinux/isolinux.cfg
+
+
